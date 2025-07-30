@@ -1,0 +1,21 @@
+{
+    "apps":[
+        {
+            "name": "crew",
+            "log":"./storage/crew.out.log",
+            "instances": 1,
+            "script": "./patent",
+            "args":" schedule:run",
+            "interpreter": "./php.exe",
+            "interpreter_args": "-c ./php.ini",
+            "autorestart": true,
+            "watch": ".",
+            "ignore_watch":[
+                "./storage"
+            ],
+            "cron_restart": "5 0 * * *",
+            "merge_logs":true,
+            "log_date_format": "YYYY-MM-DD HH:mm:ss"
+        }
+    ]
+}
