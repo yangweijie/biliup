@@ -927,6 +927,8 @@ class BilibiliUploadCommand extends Command
     private function selectCategory($driver): void
     {
         try {
+            $this->info('正在选择分区...');
+
             // 使用更通用的方法查找分区相关元素
             $categorySelectors = [
                 "//button[contains(text(), '分区')]",
@@ -959,8 +961,18 @@ class BilibiliUploadCommand extends Command
                             $musicOptions = $driver->findElements(\Facebook\WebDriver\WebDriverBy::xpath($musicSelector));
                             if (!empty($musicOptions) && $musicOptions[0]->isDisplayed()) {
                                 $musicOptions[0]->click();
+                                sleep(2);
                                 $this->info("已选择音乐分区");
-                                return;
+
+                                // 验证分区选择是否正确
+                                if ($this->verifyCategorySelection($driver)) {
+                                    return;
+                                } else {
+                                    $this->warn('分区选择验证失败，尝试重新选择');
+                                    // 重新选择音乐分享官话题
+                                    $this->selectActivity($driver, true);
+                                    return;
+                                }
                             }
                         }
                     }
@@ -972,6 +984,56 @@ class BilibiliUploadCommand extends Command
             $this->warn('未找到分区选择器，跳过分区设置');
         } catch (\Exception $e) {
             $this->warn('选择分区失败: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 验证分区选择是否正确
+     */
+    private function verifyCategorySelection($driver): bool
+    {
+        try {
+            $this->info('验证分区选择...');
+
+            // 查找显示当前选择分区的元素
+            $selectedCategorySelectors = [
+                'p.select-item-cont-inserted',
+                '.select-item-cont-inserted',
+                '.selected-category',
+                '.category-selected',
+                '.current-category'
+            ];
+
+            foreach ($selectedCategorySelectors as $selector) {
+                try {
+                    $elements = $driver->findElements(\Facebook\WebDriver\WebDriverBy::cssSelector($selector));
+                    if (!empty($elements)) {
+                        foreach ($elements as $element) {
+                            if ($element->isDisplayed()) {
+                                $text = trim($element->getText());
+                                $this->info("当前选择的分区文本: '{$text}'");
+
+                                // 检查文本是否包含"音乐"
+                                if (!empty($text) && strpos($text, '音乐') !== false) {
+                                    $this->info('✅ 分区选择验证成功：音乐分区');
+                                    return true;
+                                } else {
+                                    $this->warn("❌ 分区选择验证失败：当前分区为 '{$text}'，不是音乐分区");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+
+            $this->warn('未找到分区选择验证元素');
+            return false;
+        } catch (\Exception $e) {
+            $this->warn('验证分区选择失败: ' . $e->getMessage());
+            return false;
         }
     }
 
@@ -1003,11 +1065,15 @@ class BilibiliUploadCommand extends Command
     /**
      * 选择活动
      */
-    private function selectActivity($driver): void
+    private function selectActivity($driver, bool $forceReselect = false): void
     {
         try {
             $activityName = getenv('BILIBILI_ACTIVITY') ?: '音乐分享官';
-            $this->info("正在设置活动/话题: {$activityName}");
+            if ($forceReselect) {
+                $this->info("重新设置活动/话题: {$activityName}");
+            } else {
+                $this->info("正在设置活动/话题: {$activityName}");
+            }
 
             // 查找参与话题的选择器
             $topicSelectors = [
@@ -1204,8 +1270,10 @@ class BilibiliUploadCommand extends Command
                 }
             }
 
-            // 查找提交按钮 - 基于调试信息优化选择器
+            // 查找提交按钮 - 优先使用 .submit-add 选择器
             $submitSelectors = [
+                // 优先使用指定的选择器
+                '.submit-add',
                 // 文本识别
                 "//button[contains(text(), '立即投稿')]",
                 "//button[contains(text(), '发布')]",
