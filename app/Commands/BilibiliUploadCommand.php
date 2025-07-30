@@ -1759,30 +1759,29 @@ class BilibiliUploadCommand extends Command
 
                 $result = $driver->executeScript($setScript);
                 $this->info("已设置 bili_videoup_submit_auto_tips = {$result}");
+                 // 同时设置其他可能有用的投稿相关 localStorage
+                $additionalStorageScript = "
+                    // 设置其他投稿相关的 localStorage
+                    localStorage.setItem('bili_videoup_guide_dismissed', '1');
+                    localStorage.setItem('bili_videoup_tips_shown', '1');
+                    localStorage.setItem('bili_upload_auto_submit_tips', '1');
+                    localStorage.setItem('bili_upload_guide_closed', '1');
+
+                    // 返回设置的值用于确认
+                    return {
+                        'bili_videoup_submit_auto_tips': localStorage.getItem('bili_videoup_submit_auto_tips'),
+                        'bili_videoup_guide_dismissed': localStorage.getItem('bili_videoup_guide_dismissed'),
+                        'bili_videoup_tips_shown': localStorage.getItem('bili_videoup_tips_shown'),
+                        'bili_upload_auto_submit_tips': localStorage.getItem('bili_upload_auto_submit_tips'),
+                        'bili_upload_guide_closed': localStorage.getItem('bili_upload_guide_closed')
+                    };
+                ";
+
+                $storageResult = $driver->executeScript($additionalStorageScript);
+                $this->info('投稿页面 localStorage 设置完成');
             } else {
                 $this->info("bili_videoup_submit_auto_tips 已存在，值为: {$autoTipsValue}");
             }
-
-            // 同时设置其他可能有用的投稿相关 localStorage
-            $additionalStorageScript = "
-                // 设置其他投稿相关的 localStorage
-                localStorage.setItem('bili_videoup_guide_dismissed', '1');
-                localStorage.setItem('bili_videoup_tips_shown', '1');
-                localStorage.setItem('bili_upload_auto_submit_tips', '1');
-                localStorage.setItem('bili_upload_guide_closed', '1');
-
-                // 返回设置的值用于确认
-                return {
-                    'bili_videoup_submit_auto_tips': localStorage.getItem('bili_videoup_submit_auto_tips'),
-                    'bili_videoup_guide_dismissed': localStorage.getItem('bili_videoup_guide_dismissed'),
-                    'bili_videoup_tips_shown': localStorage.getItem('bili_videoup_tips_shown'),
-                    'bili_upload_auto_submit_tips': localStorage.getItem('bili_upload_auto_submit_tips'),
-                    'bili_upload_guide_closed': localStorage.getItem('bili_upload_guide_closed')
-                };
-            ";
-
-            $storageResult = $driver->executeScript($additionalStorageScript);
-            $this->info('投稿页面 localStorage 设置完成');
 
             // 显示设置的值
             if (is_array($storageResult)) {
