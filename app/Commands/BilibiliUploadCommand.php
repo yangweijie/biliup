@@ -453,16 +453,23 @@ class BilibiliUploadCommand extends Command
 
         $this->info("启动 ChromeDriver: $chromeDriverPath");
 
-        // 在后台启动 ChromeDriver
+        // 使用 symfony/process 在后台启动 ChromeDriver
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $commandArr = [$chromeDriverPath, '--port=9515'];
 
-        if ($isWindows) {
-            $command = "start /B \"\" \"$chromeDriverPath\" --port=9515";
-        } else {
-            $command = "$chromeDriverPath --port=9515 &";
+        try {
+            // 引入 Process 类
+            if (!class_exists('Symfony\Component\Process\Process')) {
+                require_once base_path('vendor/autoload.php');
+            }
+            $process = new \Symfony\Component\Process\Process($commandArr);
+            $process->setTimeout(60);
+            $process->disableOutput();
+            $process->start();
+        } catch (\Exception $e) {
+            $this->error('ChromeDriver 启动失败: ' . $e->getMessage());
+            return false;
         }
-
-        exec($command);
 
         // 等待 ChromeDriver 启动
         sleep(2);
@@ -762,6 +769,7 @@ class BilibiliUploadCommand extends Command
             '--no-sandbox',
             '--disable-dev-shm-usage',
             '--disable-web-security',
+            '--enable-unsafe-swiftshader',
             // 反检测 - 隐藏自动化特征
             '--disable-blink-features=AutomationControlled',
             '--exclude-switches=enable-automation',
@@ -1960,7 +1968,7 @@ class BilibiliUploadCommand extends Command
             'file_path' => $filePath
         ];
 
-        file_put_contents($processedFile, json_encode($processed, JSON_PRETTY_PRINT));
+        file_put_contents($processedFile, json_encode($processed, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
     }
 
     /**
