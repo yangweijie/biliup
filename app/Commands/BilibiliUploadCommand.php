@@ -1824,6 +1824,8 @@ class BilibiliUploadCommand extends Command
 
             $autoTipsValue = $driver->executeScript($checkScript);
 
+            $storageResult = []; 
+
             if ($autoTipsValue === null || $autoTipsValue === '') {
                 $this->info('bili_videoup_submit_auto_tips 不存在，正在设置...');
 
