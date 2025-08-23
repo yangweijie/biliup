@@ -97,16 +97,16 @@ cp .env.example .env
 
 ```bash
 # 1. 扫描文件（查看待处理的视频文件）
-php patent up --scan
+php biliup up --scan
 
 # 2. 查看统计信息
-php patent up --stats
+php biliup up --stats
 
 # 3. 开始自动上传
-php patent up
+php biliup up
 
 # 4. 跳过确认直接开始
-php patent up --yes
+php biliup up --yes
 ```
 
 ---
@@ -115,13 +115,13 @@ php patent up --yes
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| `--scan` | 仅扫描文件，不执行上传 | `php patent up --scan` |
-| `--stats` | 显示处理统计信息 | `php patent up --stats` |
-| `--reset` | 重置处理记录 | `php patent up --reset` |
-| `--test-files=N` | 创建 N 个测试文件 | `php patent up --test-files=5` |
-| `--cleanup` | 清理测试文件 | `php patent up --cleanup` |
-| `--dir=PATH` | 指定扫描目录 | `php patent up --dir=/path/to/videos` |
-| `--yes` | 跳过确认直接开始上传 | `php patent up --yes` |
+| `--scan` | 仅扫描文件，不执行上传 | `php biliup up --scan` |
+| `--stats` | 显示处理统计信息 | `php biliup up --stats` |
+| `--reset` | 重置处理记录 | `php biliup up --reset` |
+| `--test-files=N` | 创建 N 个测试文件 | `php biliup up --test-files=5` |
+| `--cleanup` | 清理测试文件 | `php biliup up --cleanup` |
+| `--dir=PATH` | 指定扫描目录 | `php biliup up --dir=/path/to/videos` |
+| `--yes` | 跳过确认直接开始上传 | `php biliup up --yes` |
 
 ---
 
@@ -179,13 +179,13 @@ UPLOAD_INTERVAL=30
 ### 运行测试
 ```bash
 # 运行所有测试
-php patent test
+php biliup test
 
 # 运行单元测试
-php patent test --testsuite=Unit
+php biliup test --testsuite=Unit
 
 # 运行浏览器测试
-php patent test --testsuite=Browser
+php biliup test --testsuite=Browser
 ```
 
 ### 测试覆盖
