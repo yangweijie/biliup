@@ -247,7 +247,7 @@ class BilibiliUploadCommand extends Command
         try {
             $testFiles = $this->fileScanner->createTestFiles($sourceFile, $count);
             $this->info("成功创建 " . count($testFiles) . " 个测试文件:");
-            
+
             foreach ($testFiles as $file) {
                 $this->line("- " . basename($file));
             }
@@ -417,6 +417,7 @@ class BilibiliUploadCommand extends Command
             $paths = [
                 'vendor/laravel/dusk/bin/chromedriver-linux',
                 'vendor/laravel/dusk/bin/chromedriver',
+                'vendor/laravel/dusk/bin/chromedriver-mac-arm',
                 './chromedriver',
                 'chromedriver'
             ];
@@ -1824,7 +1825,7 @@ class BilibiliUploadCommand extends Command
 
             $autoTipsValue = $driver->executeScript($checkScript);
 
-            $storageResult = []; 
+            $storageResult = [];
 
             if ($autoTipsValue === null || $autoTipsValue === '') {
                 $this->info('bili_videoup_submit_auto_tips 不存在，正在设置...');
