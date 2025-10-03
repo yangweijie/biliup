@@ -41,7 +41,7 @@ class UploadPage extends Page
             '@description-textarea' => 'textarea[placeholder*="简介"], textarea[name="desc"], .desc-input textarea',
 
             // 分区选择
-            '@category-select' => '.category-select, .type-select, .partition-select',
+            '@category-select' => '.select-controller',
             '@category-dropdown' => '.category-dropdown, .type-dropdown, .partition-dropdown',
             '@category-music' => 'li[data-value*="音乐"], .category-item:contains("音乐")',
 
@@ -53,10 +53,10 @@ class UploadPage extends Page
             // 活动选择
             '@activity-select' => '.activity-select, .topic-select, .event-select',
             '@activity-dropdown' => '.activity-dropdown, .topic-dropdown, .event-dropdown',
-            '@activity-music' => 'li:contains("音乐分享关"), .activity-item:contains("音乐分享关")',
+            '@activity-music' => 'li:contains("音乐分享官"), .activity-item:contains("音乐分享官")',
 
             // 提交相关
-            '@agree-checkbox' => '.agree-checkbox input, .protocol-checkbox input, input[type="checkbox"]',
+            '@agree-checkbox' => '.agree-checkbox input, .protocol-checkbox input',
             '@submit-btn' => '.submit-btn, .publish-btn, .confirm-btn, button:contains("立即投稿")',
             '@submit-success' => '.submit-success, .publish-success, .success-message',
             '@submit-error' => '.submit-error, .publish-error, .error-message',
@@ -256,7 +256,7 @@ class UploadPage extends Page
 
         try {
             // 等待分区选择器出现
-            $categorySelectors = ['@category-select', '.type-select', '.partition-select', '.category-btn'];
+            $categorySelectors = ['@category-select'];
             $selectorFound = false;
 
             foreach ($categorySelectors as $selector) {
@@ -438,7 +438,7 @@ class UploadPage extends Page
             $activityOptions = [
                 "li:contains('{$activity}')",
                 ".activity-item:contains('{$activity}')",
-                ".topic-item:contains('{$activity}')",
+                ".hot-tag-container:contains('{$activity}')",
                 ".option:contains('{$activity}')",
                 "[data-value*='音乐分享关']",
                 "[data-activity*='音乐分享关']"
@@ -484,35 +484,9 @@ class UploadPage extends Page
         echo "正在提交投稿...\n";
 
         try {
-            // 查找并勾选同意协议复选框
-            $checkboxSelectors = ['@agree-checkbox', '.protocol-checkbox input', '.agree-protocol input', 'input[type="checkbox"]'];
-            $checkboxFound = false;
-
-            foreach ($checkboxSelectors as $selector) {
-                try {
-                    $browser->waitFor($selector, 3);
-                    if (!$browser->element($selector)->isSelected()) {
-                        $browser->check($selector);
-                        echo "已勾选同意协议\n";
-                    } else {
-                        echo "协议复选框已勾选\n";
-                    }
-                    $checkboxFound = true;
-                    break;
-                } catch (\Exception $e) {
-                    continue;
-                }
-            }
-
-            if (!$checkboxFound) {
-                echo "⚠ 未找到协议复选框，继续提交流程\n";
-            }
-
-            // 等待一下确保页面状态稳定
-            sleep(2);
 
             // 查找并点击提交按钮
-            $submitSelectors = ['@submit-btn', '.publish-btn', '.confirm-btn', 'button:contains("立即投稿")', 'button:contains("发布")', 'button:contains("提交")'];
+            $submitSelectors = ['@submit-btn', '.publish-btn', '.confirm-btn', 'button:contains("立即投稿")'];
             $submitFound = false;
 
             foreach ($submitSelectors as $selector) {
